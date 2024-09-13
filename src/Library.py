@@ -3,6 +3,7 @@ from src.User import User
 from typing import List
 from operator import indexOf
 
+
 class Library:
     def __init__(self):
         self.__books: List[Book] = []
@@ -39,7 +40,7 @@ class Library:
         pass
 
     # 2.1 Check out book
-    def check_out_book(self, isbn, dni, due_date):
+    def check_out_book(self, isbn, dni, due_date) -> str:
         list_of_dni: List[str] = []
         list_of_isbn: List[str] = []
         for user in self.__users:
@@ -58,7 +59,7 @@ class Library:
             return f"Unable to find the data for the values: ISBN {isbn} and DNI: {dni}"
 
     # 2.2 Check in book
-    def check_in_book(self, isbn, dni, returned_date):
+    def check_in_book(self, isbn, dni, returned_date) -> str:
         list_of_isbn: List[str] = []
         list_of_dni: List[str] = []
         for book in self.__books:
