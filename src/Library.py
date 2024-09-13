@@ -1,7 +1,5 @@
 from src.Book import Book
 from src.User import User
-
-
 from typing import List, Optional
 
 class Library:
