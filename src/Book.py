@@ -1,4 +1,8 @@
+# from typing import Self
+
+
 class Book:
+
     def __init__(self, isbn: str, title: str, author: str, available: bool = True, checkout_num: int = 0) -> None:
         self.__isbn: str = isbn
         self.__title: str = title
@@ -31,9 +35,7 @@ class Book:
 
     # Utils
     def __str__(self) -> str:
-        return f"ISBN: {self.__isbn}, Title: {self.__title}, Author: {self.__author}"
+        pass
 
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, Book):
-            return self.__isbn == other.get_isbn()
-        return False
+    def __eq__(self, other):
+        pass
