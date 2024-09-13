@@ -1,12 +1,12 @@
 class User:
-    def __init__(self, dni: int, name: str, number_of_checkouts: int = 0, number_of_checkins: int = 0) -> None:
-        self.__dni: int = dni
+    def __init__(self, dni: str, name: str, number_of_checkouts: int = 0, number_of_checkins: int = 0):
+        self.__dni: str = dni
         self.__name: str = name
         self.__number_of_checkouts: int = number_of_checkouts
         self.__number_of_checkins: int = number_of_checkins
 
     # Getters
-    def get_dni(self) -> int:
+    def get_dni(self) -> str:
         return self.__dni
 
     def get_name(self) -> str:
@@ -24,6 +24,3 @@ class User:
 
     def increment_checkins(self) -> None:
         self.__number_of_checkins += 1
-
-    def __str__(self) -> str:
-        return f"DNI: {self.__dni}, Name: {self.__name}, Checkouts: {self.__number_of_checkouts}, Checkins: {self.__number_of_checkins}"
