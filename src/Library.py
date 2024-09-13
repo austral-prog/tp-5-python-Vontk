@@ -1,75 +1,84 @@
 from src.Book import Book
 from src.User import User
-from typing import List, Optional
+from typing import List
+from operator import indexOf
 
 class Library:
-    def __init__(self) -> None:
+    def __init__(self):
         self.__books: List[Book] = []
         self.__users: List[User] = []
-        self.__checked_out_books: List[List[str, int, str]] = []  # [ISBN, DNI, DUE_DATE]
-        self.__checked_in_books: List[List[str, int, str]] = []   # [ISBN, DNI, RETURNED_DATE]
+        self.__checked_out_books: List[Book] = []
+        self.__checked_in_books: List[Book] = []
+
+    # Getters
+    def get_books(self) -> List[Book]:
+        return self.__books
+
+    def get_users(self) -> List[User]:
+        return self.__users
+
+    def get_checked_out_books(self) -> List[Book]:
+        return self.__checked_out_books
+
+    def get_checked_in_books(self) -> List[Book]:
+        return self.__checked_in_books
 
     # 1.1 Add Book
     def add_book(self, isbn: str, title: str, author: str) -> None:
-        new_book = Book(isbn, title, author)
-        self.__books.append(new_book)
+        list_of_isbn: List[str] = []
+        for book in self.__books:
+            list_of_isbn.append(book.get_isbn())
+        if isbn not in list_of_isbn:
+            new_book: Book = Book.Book(isbn, title, author)
+            self.__books.append(new_book)
 
     # 1.2 List All Books
     def list_all_books(self) -> None:
         for book in self.__books:
-            print(str(book))
-
-    # Utils
-    def find_book_by_isbn(self, isbn: str) -> Optional[Book]:
-        for book in self.__books:
-            if book.get_isbn() == isbn:
-                return book
-        return None
-
-    def find_user_by_dni(self, dni: int) -> Optional[User]:
-        for user in self.__users:
-            if user.get_dni() == dni:
-                return user
-        return None
-
-    def add_user(self, dni: int, name: str) -> None:
-        user = User(dni, name)
-        self.__users.append(user)
+            print(f"ISBN: {book.get_isbn()}, Title: {book.get_title()}, Author: {book.get_title()}")
+        pass
 
     # 2.1 Check out book
-    def check_out_book(self, isbn: str, dni: int, due_date: str) -> str:
-        book = self.find_book_by_isbn(isbn)
-        user = self.find_user_by_dni(dni)
-
-        if not book or not user:
+    def check_out_book(self, isbn, dni, due_date):
+        list_of_dni: List[str] = []
+        list_of_isbn: List[str] = []
+        for user in self.__users:
+            list_of_dni.append(user.get_dni())
+        for book in self.__books:
+            list_of_isbn.append(book.get_isbn())
+        if isbn in list_of_isbn and dni in list_of_dni:
+            if self.__books[indexOf(list_of_isbn, isbn)].is_aviable:
+                self.__books[indexOf(list_of_isbn, isbn)].set_aviable(False)
+                self.__checked_out_books.append(self.__books[indexOf(list_of_isbn, isbn)])
+                self.__users[indexOf(list_of_dni, dni)].increment_checkouts()
+                return f"User {dni} checked out book {isbn}"
+            else:
+                return f"Book {isbn} is not available"
+        else:
             return f"Unable to find the data for the values: ISBN {isbn} and DNI: {dni}"
 
-        if not book.is_available():
-            return f"Book {isbn} is not available"
-
-        # Proceed to check out
-        book.set_available(False)
-        book.increment_checkout_num()
-        user.increment_checkouts()
-        self.__checked_out_books.append([isbn, dni, due_date])
-        return f"User {dni} checked out book {isbn}"
-
     # 2.2 Check in book
-    def check_in_book(self, isbn: str, dni: int, returned_date: str) -> str:
-        book = self.find_book_by_isbn(isbn)
-        if not book:
-            return f"Book {isbn} is not available"
+    def check_in_book(self, isbn, dni, returned_date):
+        list_of_isbn: List[str] = []
+        list_of_dni: List[str] = []
+        for book in self.__books:
+            list_of_isbn.append(book.get_isbn())
+        for user in self.__users:
+            list_of_dni.append(user.get_dni())
+        if isbn in list_of_isbn and self.__books[indexOf(list_of_isbn, isbn)].is_aviable():
+            self.__books[indexOf(list_of_isbn, isbn)].set_aviable(True)
+            self.__checked_out_books.remove(self.__books[indexOf(list_of_isbn, isbn)])
+            self.__checked_in_books.append(self.__books[indexOf(list_of_isbn, isbn)])
+            self.__users[indexOf(list_of_dni, dni)].increment_checkins()
+            return f"User {dni} checked out book {isbn}"
+        return f"Book {isbn} is not available"
 
-        # Check if the book is checked out by the user
-        checked_out = next((entry for entry in self.__checked_out_books if entry[0] == isbn and entry[1] == dni), None)
-        if not checked_out:
-            return f"Book {isbn} is not available"
+    # Utils
+    def add_user(self, dni: str, name: str) -> None:
+        list_of_dni: List[str] = []
+        for user in self.__users:
+            list_of_dni.append(user.get_dni())
+        if dni not in list_of_dni:
+            self.__users.append(User.User(dni, name))
+        pass
 
-        # Proceed to check in
-        book.set_available(True)
-        user = self.find_user_by_dni(dni)
-        if user:
-            user.increment_checkins()
-        self.__checked_out_books.remove(checked_out)
-        self.__checked_in_books.append([isbn, dni, returned_date])
-        return f"Book {isbn} checked in by user {dni}"
