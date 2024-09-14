@@ -1,4 +1,5 @@
 # from typing import Self
+# from typing import Self
 
 
 class Book:
@@ -35,7 +36,10 @@ class Book:
 
     # Utils
     def __str__(self) -> str:
-        pass
+        return f"ISBN: {self.__isbn}, Title: {self.__title}, Author: {self.__author}"
 
-    def __eq__(self, other):
-        pass
+    def __eq__(self, other: "Book") -> bool:
+        if self.__isbn == other.get_isbn():
+            if isinstance(other, Book):
+                return True
+        return False
