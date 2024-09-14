@@ -3,7 +3,7 @@ from src.User import User
 from typing import List
 
 class Library:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__books: List[Book] = []
         self.__users: List[User] = []
         self.__checked_out_books: List[Book] = []
