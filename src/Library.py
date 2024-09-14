@@ -1,7 +1,6 @@
 from src.Book import Book
 from src.User import User
 from typing import List
-from operator import indexOf
 
 class Library:
     def __init__(self):
@@ -25,11 +24,8 @@ class Library:
 
     # 1.1 Add Book
     def add_book(self, isbn: str, title: str, author: str) -> None:
-        list_of_isbn: List[str] = []
-        for book in self.__books:
-            list_of_isbn.append(book.get_isbn())
-        if isbn not in list_of_isbn:
-            new_book: Book = Book.Book(isbn, title, author)
+        if not any(book.get_isbn() == isbn for book in self.__books):
+            new_book = Book(isbn, title, author)
             self.__books.append(new_book)
 
     # 1.2 List All Books
@@ -39,18 +35,20 @@ class Library:
         pass
 
     # 2.1 Check out book
-    def check_out_book(self, isbn, dni, due_date) -> str:
-        list_of_dni: List[str] = []
+    def check_out_book(self, isbn: str, dni: int, due_date: str) -> str:
+        list_of_dni: List[int] = []
         list_of_isbn: List[str] = []
         for user in self.__users:
             list_of_dni.append(user.get_dni())
         for book in self.__books:
             list_of_isbn.append(book.get_isbn())
+        book_index: int = list_of_isbn.index(isbn)
+        user_index: int = list_of_dni.index(dni)
         if isbn in list_of_isbn and dni in list_of_dni:
-            if self.__books[indexOf(list_of_isbn, isbn)].is_aviable:
-                self.__books[indexOf(list_of_isbn, isbn)].set_aviable(False)
-                self.__checked_out_books.append(self.__books[indexOf(list_of_isbn, isbn)])
-                self.__users[indexOf(list_of_dni, dni)].increment_checkouts()
+            if self.__books[book_index].is_available():
+                self.__books[book_index].set_available(False)
+                self.__checked_out_books.append(self.__books[book_index])
+                self.__users[user_index].increment_checkouts()
                 return f"User {dni} checked out book {isbn}"
             else:
                 return f"Book {isbn} is not available"
@@ -58,27 +56,25 @@ class Library:
             return f"Unable to find the data for the values: ISBN {isbn} and DNI: {dni}"
 
     # 2.2 Check in book
-    def check_in_book(self, isbn, dni, returned_date) -> str:
+    def check_in_book(self, isbn: str, dni: int, returned_date: str) -> str:
         list_of_isbn: List[str] = []
-        list_of_dni: List[str] = []
+        list_of_dni: List[int] = []
         for book in self.__books:
             list_of_isbn.append(book.get_isbn())
         for user in self.__users:
             list_of_dni.append(user.get_dni())
-        if isbn in list_of_isbn and self.__books[indexOf(list_of_isbn, isbn)].is_aviable():
-            self.__books[indexOf(list_of_isbn, isbn)].set_aviable(True)
-            self.__checked_out_books.remove(self.__books[indexOf(list_of_isbn, isbn)])
-            self.__checked_in_books.append(self.__books[indexOf(list_of_isbn, isbn)])
-            self.__users[indexOf(list_of_dni, dni)].increment_checkins()
-            return f"User {dni} checked out book {isbn}"
+        book_index: int = list_of_isbn.index(isbn)
+        user_index: int = list_of_dni.index(dni)
+        if isbn in list_of_isbn and not self.__books[book_index].is_available():
+            self.__books[book_index].set_available(True)
+            self.__checked_out_books.remove(self.__books[book_index])
+            self.__checked_in_books.append(self.__books[book_index])
+            self.__users[user_index].increment_checkins()
+            return f"Book {isbn} checked in by user {dni}"
         return f"Book {isbn} is not available"
 
     # Utils
-    def add_user(self, dni: str, name: str) -> None:
-        list_of_dni: List[str] = []
-        for user in self.__users:
-            list_of_dni.append(user.get_dni())
-        if dni not in list_of_dni:
-            self.__users.append(User.User(dni, name))
-        pass
-
+    def add_user(self, dni: int, name: str) -> None:
+        if not any(user.get_dni() == dni for user in self.__users):
+            new_user = User(dni, name)
+            self.__users.append(new_user)
