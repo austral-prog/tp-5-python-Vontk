@@ -3,7 +3,6 @@ from src.User import User
 from typing import List
 from operator import indexOf
 
-
 class Library:
     def __init__(self):
         self.__books: List[Book] = []
@@ -36,7 +35,7 @@ class Library:
     # 1.2 List All Books
     def list_all_books(self) -> None:
         for book in self.__books:
-            print(f"ISBN: {book.get_isbn()}, Title: {book.get_title()}, Author: {book.get_title()}")
+            print(book.__str__())
         pass
 
     # 2.1 Check out book
